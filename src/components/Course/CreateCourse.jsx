@@ -1,42 +1,55 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
+import { getUserFromToken } from "../../utils/auth";
 
 const CreateCourse = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [teacherId, setTeacherId] = useState("");
   const [categories, setCategories] = useState([]);
-  const [teachers, setTeachers] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch all categories and teachers for dropdowns
+  const [teacherId, setTeacherId] = useState(null);
+
+  // 🔹 Get teacherId from token
   useEffect(() => {
-    const fetchData = async () => {
+    const user = getUserFromToken();
+    if (user && user.userId) {
+      setTeacherId(user.userId);
+      console.log("Teacher ID from token:", user.userId);
+    } else {
+      alert("⚠️ No teacher ID found in token! Please login again.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  // 🔹 Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
       try {
-        // Fetch categories
         const categoryRes = await api.get("/CategoryCourse/GetAll");
         setCategories(categoryRes.data);
-
-        // Fetch teachers
-        const teacherRes = await api.get("/Admin/teachers");
-        setTeachers(teacherRes.data);
       } catch (error) {
-        console.error("Failed to fetch data:", error);
-        alert("Error fetching dropdown data. Please try again later.");
+        console.error("Failed to fetch categories:", error);
+        alert("Error fetching categories. Please try again later.");
       }
     };
-    fetchData();
+    fetchCategories();
   }, []);
 
-  // Handle course creation
+  // 🔹 Handle course creation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!categoryId || !teacherId) {
-      alert("Please select both category and teacher.");
+    if (!categoryId) {
+      alert("Please select a category.");
+      return;
+    }
+
+    if (!teacherId) {
+      alert("Teacher ID missing. Please login again.");
       return;
     }
 
@@ -46,7 +59,7 @@ const CreateCourse = () => {
         description,
         price: parseFloat(price),
         categoryCourseId: parseInt(categoryId),
-        teacherId: teacherId,
+        teacherId: teacherId, // ✅ Auto from token
       };
 
       await api.post("/Course/Create", payload);
@@ -54,7 +67,6 @@ const CreateCourse = () => {
       alert("✅ Course created successfully!");
       navigate("/course");
     } catch (error) {
-      console.error(`Bearer ${localStorage.getItem("token")}`);
       console.error("Failed to create course:", error);
       alert("❌ Failed to create course. Check console for details.");
     }
@@ -68,7 +80,6 @@ const CreateCourse = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Course Title */}
           <input
             type="text"
             placeholder="Course Title"
@@ -78,7 +89,6 @@ const CreateCourse = () => {
             required
           />
 
-          {/* Description */}
           <textarea
             placeholder="Description"
             value={description}
@@ -88,7 +98,6 @@ const CreateCourse = () => {
             required
           />
 
-          {/* Price */}
           <input
             type="number"
             placeholder="Price"
@@ -98,7 +107,6 @@ const CreateCourse = () => {
             required
           />
 
-          {/* Category Dropdown */}
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
@@ -113,22 +121,6 @@ const CreateCourse = () => {
             ))}
           </select>
 
-          {/* Teacher Dropdown */}
-          <select
-            value={teacherId}
-            onChange={(e) => setTeacherId(e.target.value)}
-            className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          >
-            <option value="">Select Teacher</option>
-            {teachers.map((teacher) => (
-              <option key={teacher.id} value={teacher.id}>
-                {teacher.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Buttons */}
           <div className="flex gap-2 mt-4">
             <button
               type="submit"

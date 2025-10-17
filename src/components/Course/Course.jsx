@@ -7,14 +7,13 @@ const Course = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pageSize, setPageSize] = useState(5); // default page size
   const navigate = useNavigate();
 
-  const pageSize = 5;
-
-  const fetchCourses = async (pageNumber = 1, query = "") => {
+  const fetchCourses = async (pageNumber = 1, query = "", size = pageSize) => {
     try {
       const response = await api.get(
-        `/Course/GetAll?page=${pageNumber}&pageSize=${pageSize}&search=${query}`
+        `/Course/GetAll?page=${pageNumber}&pageSize=${size}&search=${query}`
       );
       const items = response.data.items ?? response.data;
       setCourses(items);
@@ -27,23 +26,23 @@ const Course = () => {
   };
 
   useEffect(() => {
-    fetchCourses();
-  }, []);
+    fetchCourses(page, searchTerm, pageSize);
+  }, [pageSize]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchCourses(1, searchTerm);
+    fetchCourses(1, searchTerm, pageSize);
   };
 
   const handlePrevious = () => {
     if (page > 1) {
-      fetchCourses(page - 1, searchTerm);
+      fetchCourses(page - 1, searchTerm, pageSize);
     }
   };
 
   const handleNext = () => {
     if (page < totalPages) {
-      fetchCourses(page + 1, searchTerm);
+      fetchCourses(page + 1, searchTerm, pageSize);
     }
   };
 
@@ -70,6 +69,19 @@ const Course = () => {
           </button>
         </form>
 
+        {/* Page Size Dropdown */}
+        <select
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="border p-2 rounded-lg"
+        >
+          {[5, 10, 15, 20, 30, 50].map((size) => (
+            <option key={size} value={size}>
+              {size} per page
+            </option>
+          ))}
+        </select>
+
         {/* Add Button */}
         <button
           onClick={() => navigate("/course/create")}
@@ -87,16 +99,12 @@ const Course = () => {
             className="border rounded-xl shadow-lg p-6 bg-white flex flex-col items-center text-center"
           >
             <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-            <p className="text-gray-700 font-medium mb-4">
+            <p className="text-gray-700 font-medium mb-2">
               Price: ${course.price}
             </p>
-
-            <button
-              onClick={() => navigate(`/course/details/${course.courseId}`)}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
-            >
-              Details
-            </button>
+            <p className="text-gray-500 font-medium">
+              Written by: {course.teacherName}
+            </p>
           </div>
         ))}
       </div>
@@ -104,7 +112,6 @@ const Course = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-8 gap-2 flex-wrap">
-          {/* Previous */}
           <button
             onClick={handlePrevious}
             disabled={page === 1}
@@ -117,11 +124,10 @@ const Course = () => {
             Previous
           </button>
 
-          {/* Page Numbers */}
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <button
               key={p}
-              onClick={() => fetchCourses(p, searchTerm)}
+              onClick={() => fetchCourses(p, searchTerm, pageSize)}
               className={`px-3 py-1 rounded ${
                 page === p
                   ? "bg-blue-600 text-white"
@@ -132,7 +138,6 @@ const Course = () => {
             </button>
           ))}
 
-          {/* Next */}
           <button
             onClick={handleNext}
             disabled={page === totalPages}
