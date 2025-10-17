@@ -14,20 +14,22 @@ const Login = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await api.post("/Account/login", form);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await api.post("/Account/login", form);
 
-      const { message, userName } = response.data;
-      localStorage.setItem("userName", userName);
+    const { token, message, userName } = response.data;
 
-      alert(message || "Login successful!");
-      navigate("/Home");
-    } catch (error) {
-      alert(error.response?.data || "Login failed");
-    }
-  };
+    localStorage.setItem("token", token);
+    localStorage.setItem("userName", userName);
+
+    alert(message || "Login successful!");
+    navigate("/Home");
+  } catch (error) {
+    alert(error.response?.data || "Login failed");
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-blue-100">
