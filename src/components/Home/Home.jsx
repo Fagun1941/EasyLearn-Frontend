@@ -1,20 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getUserFromToken } from "../../utils/auth"; 
+import api from "../../api/axiosConfig";
 
 const Home = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("userName");
-    if (storedUser) setUser(storedUser);
+    const storedUser = getUserFromToken();
+     alert(`Debug: ${JSON.stringify(storedUser)}`);
+    if (storedUser) setUser(storedUser.userName);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("userName");
-    setUser(null);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await api.post("/Account/logout"); 
+      alert("Logged out successfully");
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      alert("You have been logged out.");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("token");
+      setUser(null);
+      navigate("/login");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
