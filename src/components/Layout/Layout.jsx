@@ -34,6 +34,9 @@ const Layout = () => {
           <Link to="/" className="font-semibold hover:underline">
             Home
           </Link>
+          <Link to="/Admin" className="hover:underline">
+            Admin
+          </Link>
           <Link to="/category" className="hover:underline">
             Category
           </Link>
