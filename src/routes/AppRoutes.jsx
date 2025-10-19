@@ -10,11 +10,13 @@ import CourseDetails from "../components/Course/CourseDetails";
 import CourseEdit from "../components/Course/CourseEdit";
 import Layout from "../components/Layout/Layout";
 import MyCourse from "../components/Course/MyCourse";
+import Dashboard from "../components/Admin/Dashbord";
+import AllUsers from "../components/Admin/AllUsrs";
+import TeacherList from "../components/Admin/TeacherList";
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* All pages with Navbar */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
@@ -24,9 +26,11 @@ const AppRoutes = () => {
         <Route path="/course/details/:id" element={<CourseDetails />} />
         <Route path="/course/edit/:id" element={<CourseEdit />} />
         <Route path="/my-course" element={<MyCourse />} />
+        <Route path="/Admin" element={<Dashboard />} />
+        <Route path="/users" element={<AllUsers />} />
+        <Route path="/TeacherList" element={<TeacherList />} />
       </Route>
 
-      {/* Pages without Navbar */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>

@@ -12,7 +12,7 @@ const MyCourse = () => {
     const fetchMyCourses = async () => {
       try {
         const user = getUserFromToken();
-        alert("User ID: " + (user ? user.userId : "No user"));
+        //alert("User ID: " + (user ? user.userId : "No user"));
         if (!user || !user.userId) {
           alert("User not found! Please login again.");
           return;
