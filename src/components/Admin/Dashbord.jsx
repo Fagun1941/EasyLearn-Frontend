@@ -22,9 +22,8 @@ const Dashboard = () => {
         >
           📚 See All Teachers
         </button>
-
         <button
-          onClick={() => navigate("/teacher/requests")}
+          onClick={() => navigate("/teachesRequests")}
           className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition transform hover:scale-105"
         >
           🧾 Pending Teacher Requests

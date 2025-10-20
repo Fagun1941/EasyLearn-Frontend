@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
+import { getUserFromToken } from "../../utils/auth"; // ✅ To get current user
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [pageSize, setPageSize] = useState(5); // default page size
+  const [pageSize, setPageSize] = useState(5);
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = getUserFromToken();
+    if (storedUser) {
+      setUserId(storedUser.userId);
+    }
+  }, []);
 
   const fetchCourses = async (pageNumber = 1, query = "", size = pageSize) => {
     try {
@@ -43,6 +52,25 @@ const Course = () => {
   const handleNext = () => {
     if (page < totalPages) {
       fetchCourses(page + 1, searchTerm, pageSize);
+    }
+  };
+
+  // ✅ Enroll course function
+  const handleEnroll = async (courseId) => {
+    if (!userId) {
+      alert("Please login to enroll in a course.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await api.post(
+        `/Enrollment/enroll?courseId=${courseId}&courseId=1&Id=${userId}`
+      );
+      alert(response.data.message || "Enrolled successfully!");
+    } catch (error) {
+      console.error("Enrollment failed:", error);
+      alert(error.response?.data || "Enrollment failed.");
     }
   };
 
@@ -102,9 +130,17 @@ const Course = () => {
             <p className="text-gray-700 font-medium mb-2">
               Price: ${course.price}
             </p>
-            <p className="text-gray-500 font-medium">
+            <p className="text-gray-500 font-medium mb-4">
               Written by: {course.teacherName}
             </p>
+
+            {/* ✅ Enroll Button */}
+            <button
+              onClick={() => handleEnroll(course.courseId)}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Enroll
+            </button>
           </div>
         ))}
       </div>

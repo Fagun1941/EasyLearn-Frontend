@@ -1,18 +1,34 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
+
 const TeacherList = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all teachers
+  
   const fetchTeachers = async () => {
     try {
       const response = await api.get("/Admin/teachers"); 
+      setTeachers(response.data);
     } catch (error) {
       console.error("Error fetching teachers:", error);
       alert("Failed to load teachers.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveTeacher = async (teacherId) => {
+    const confirmDelete = window.confirm("Are you sure you want to remove this teacher?");
+    if (!confirmDelete) return;
+
+    try {
+      await api.put(`Admin/Reject-Teacher?userId=${teacherId}`);
+      alert("Teacher removed successfully!");
+      setTeachers((prev) => prev.filter((t) => t.id !== teacherId));
+    } catch (error) {
+      console.error("Error removing teacher:", error);
+      alert("Failed to remove teacher.");
     }
   };
 
@@ -37,25 +53,22 @@ const TeacherList = () => {
               <th className="border border-gray-300 px-4 py-2 text-left">#</th>
               <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
               <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Phone</th>
-              <th className="border border-gray-300 px-4 py-2 text-left">Status</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
             {teachers.map((teacher, index) => (
               <tr key={teacher.id} className="hover:bg-gray-50">
                 <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
-                <td className="border border-gray-300 px-4 py-2">{teacher.fullName || "N/A"}</td>
+                <td className="border border-gray-300 px-4 py-2">{teacher.name || "N/A"}</td>
                 <td className="border border-gray-300 px-4 py-2">{teacher.email}</td>
-                <td className="border border-gray-300 px-4 py-2">{teacher.phone || "N/A"}</td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <span
-                    className={`px-2 py-1 rounded text-white ${
-                      teacher.isApproved ? "bg-green-500" : "bg-yellow-500"
-                    }`}
+                  <button
+                    onClick={() => handleRemoveTeacher(teacher.id)}
+                    className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600 transition"
                   >
-                    {teacher.isApproved ? "Approved" : "Pending"}
-                  </span>
+                    Remove Teacher
+                  </button>
                 </td>
               </tr>
             ))}
