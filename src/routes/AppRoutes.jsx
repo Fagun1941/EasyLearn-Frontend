@@ -13,6 +13,8 @@ import MyCourse from "../components/Course/MyCourse";
 import Dashboard from "../components/Admin/Dashbord";
 import AllUsers from "../components/Admin/AllUsrs";
 import TeacherList from "../components/Admin/TeacherList";
+import PendingTeacherList from "../components/Admin/PendingTeacherList";
+import MyEnrollCourses from "../components/Enrollment/MyEnrollCourses";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +31,9 @@ const AppRoutes = () => {
         <Route path="/Admin" element={<Dashboard />} />
         <Route path="/users" element={<AllUsers />} />
         <Route path="/TeacherList" element={<TeacherList />} />
+        <Route path="/teachesRequests" element={<PendingTeacherList />} />
+        <Route path="/myenroll" element={<MyEnrollCourses />} />
+
       </Route>
 
       <Route path="/login" element={<Login />} />

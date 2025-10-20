@@ -6,10 +6,13 @@ import api from "../../api/axiosConfig";
 const Layout = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-
+  const [role, setRole] = useState(null);
+  const [userId, setUserId] = useState(null);
   useEffect(() => {
     const storedUser = getUserFromToken();
     if (storedUser) setUser(storedUser.userName);
+    if (storedUser) setRole(storedUser.role);
+    if (storedUser) setUserId(storedUser.userId);
   }, []);
 
   const handleLogout = async () => {
@@ -27,6 +30,19 @@ const Layout = () => {
     }
   };
 
+  const handleSendTeacherRequest = async () => {
+    try {
+      const response = await api.post(`/Student/request-teacher?userId=${userId}`);
+      alert(response.data.message || "Teacher request sent successfully!");
+    } catch (error) {
+      console.error("Failed to send teacher request:", error);
+      alert(
+        error.response?.data?.message ||
+          "Failed to send teacher request. Please login again."
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-blue-600 p-4 shadow-md flex justify-between items-center text-white">
@@ -34,21 +50,44 @@ const Layout = () => {
           <Link to="/" className="font-semibold hover:underline">
             Home
           </Link>
-          <Link to="/Admin" className="hover:underline">
-            Admin
-          </Link>
+         {role === "Admin" && (
+            <Link to="/Admin" className="hover:underline">
+              Admin
+            </Link>
+          )}
+
+          {role === "Teacher" && (
           <Link to="/category" className="hover:underline">
             Category
           </Link>
-          <Link to="/course" className="hover:underline">
-            Course
-          </Link>
+          )}
+          {role === "Teacher" && (
           <Link to="/my-course" className="hover:underline">
             My Courses
           </Link>
+          )}
+           <Link to="/course" className="hover:underline">
+            Course
+          </Link>
+
+           {role === "Student" && (
+          <Link to="/myenroll" className="hover:underline">
+            My Enroll Courses
+          </Link>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
+
+          {user && role !== "Teacher" && role != "Admin" && (
+            <button
+              onClick={handleSendTeacherRequest}
+              className="bg-yellow-500 px-3 py-1 rounded-lg hover:bg-yellow-600 transition"
+            >
+              Send Teacher Request
+            </button>
+          )}
+
           {user ? (
             <>
               <span className="font-medium">{user}</span>
