@@ -52,7 +52,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validate()) return; // stop if validation fails
+    if (!validate()) return; 
 
     try {
       await api.post("/Account/register", form);

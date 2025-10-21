@@ -1,26 +1,43 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axiosConfig";
-import { getUserFromToken } from "../../utils/auth"; 
+import { getUserFromToken } from "../../utils/auth";
 
 const MyEnrollCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Get user from token once
+  const user = getUserFromToken();
+
   const fetchMyEnrollCourses = async () => {
     try {
-      const user = getUserFromToken();
       if (!user || !user.userId) {
         alert("User not found! Please login again.");
         return;
       }
 
-      const response = await api.get(`/Enrollment/myEnrollCourses?id=${user.userId}`);
+      const response = await api.get(
+        `/Enrollment/myEnrollCourses?id=${user.userId}`
+      );
       setCourses(response.data || []);
     } catch (error) {
       console.error("Error fetching enrolled courses:", error);
       alert("Failed to load enrolled courses.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUnenroll = async (courseId) => {
+    if (!window.confirm("Are you sure you want to unenroll from this course?")) return;
+
+    try {
+      await api.delete(`/Enrollment/unenroll?studentId=${user.userId}&courseId=${courseId}`);
+      alert("Unenrolled successfully!");
+      fetchMyEnrollCourses(); // ✅ Correct function call
+    } catch (error) {
+      console.error("Error during unenroll:", error);
+      alert("Failed to unenroll");
     }
   };
 
@@ -49,6 +66,7 @@ const MyEnrollCourses = () => {
             <th className="border border-gray-300 p-3 text-left">Course Title</th>
             <th className="border border-gray-300 p-3 text-left">Teacher</th>
             <th className="border border-gray-300 p-3 text-center">Enrolled Date</th>
+            <th className="border border-gray-300 p-3 text-center">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -60,6 +78,14 @@ const MyEnrollCourses = () => {
               <td className="border border-gray-300 p-3">{course.teacherName}</td>
               <td className="border border-gray-300 p-3 text-center">
                 {new Date(course.enrolledDate).toLocaleDateString()}
+              </td>
+              <td className="border border-gray-300 p-3 text-center">
+                <button
+                  onClick={() => handleUnenroll(course.courseId)}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Unenroll
+                </button>
               </td>
             </tr>
           ))}
