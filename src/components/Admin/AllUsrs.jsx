@@ -17,7 +17,6 @@ const AllUsers = () => {
     }
   };
 
-  // Delete user
   const handleDelete = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
@@ -33,7 +32,7 @@ const AllUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [loading]);
 
   if (loading) {
     return <p className="text-center mt-10 text-gray-600">Loading users...</p>;

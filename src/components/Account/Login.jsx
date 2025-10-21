@@ -10,14 +10,13 @@ const Login = () => {
     password: "",
   });
 
-  const [errors, setErrors] = useState({}); // to store validation errors
+  const [errors, setErrors] = useState({}); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear field-specific error
+    setErrors({ ...errors, [e.target.name]: "" }); 
   };
 
-  // ✅ Validation Function
   const validate = () => {
     const newErrors = {};
 
@@ -34,13 +33,13 @@ const Login = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // return true if no error
+    return Object.keys(newErrors).length === 0; 
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validate()) return; // Stop submission if validation fails
+    if (!validate()) return; 
 
     try {
       const response = await api.post("/Account/login", form);
