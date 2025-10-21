@@ -57,7 +57,7 @@ const MyEnrollCourses = () => {
               <td className="border border-gray-300 p-3 font-medium">
                 {course.courseName}
               </td>
-              <td className="border border-gray-300 p-3">{course.studentName}</td>
+              <td className="border border-gray-300 p-3">{course.teacherName}</td>
               <td className="border border-gray-300 p-3 text-center">
                 {new Date(course.enrolledDate).toLocaleDateString()}
               </td>

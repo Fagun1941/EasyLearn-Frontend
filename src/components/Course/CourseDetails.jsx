@@ -26,7 +26,7 @@ const CourseDetails = () => {
       try {
         await deleteCourse(id);
         alert("Course deleted successfully!");
-        navigate("/course"); // back to course list
+        navigate("/course"); 
       } catch (error) {
         console.error("Failed to delete course:", error);
         alert("Failed to delete course");
@@ -78,6 +78,13 @@ const CourseDetails = () => {
             className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition"
           >
             Back
+          </button>
+
+           <button
+            onClick={() => navigate(`/course/${id}/enrollment`)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Enrollment Person
           </button>
         </div>
       </div>

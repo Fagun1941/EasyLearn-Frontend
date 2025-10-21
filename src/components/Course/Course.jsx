@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
-import { getUserFromToken } from "../../utils/auth"; // ✅ To get current user
+import { getUserFromToken } from "../../utils/auth";
 
 const Course = () => {
   const [courses, setCourses] = useState([]);
@@ -10,12 +10,15 @@ const Course = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageSize, setPageSize] = useState(5);
   const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = getUserFromToken();
     if (storedUser) {
       setUserId(storedUser.userId);
+      setUserRole(storedUser.role);
     }
   }, []);
 
@@ -55,7 +58,6 @@ const Course = () => {
     }
   };
 
-  // ✅ Enroll course function
   const handleEnroll = async (courseId) => {
     if (!userId) {
       alert("Please login to enroll in a course.");
@@ -76,11 +78,9 @@ const Course = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold">Course Management</h2>
 
-        {/* Search */}
         <form onSubmit={handleSearch} className="flex gap-2 w-full md:w-auto">
           <input
             type="text"
@@ -97,7 +97,6 @@ const Course = () => {
           </button>
         </form>
 
-        {/* Page Size Dropdown */}
         <select
           value={pageSize}
           onChange={(e) => setPageSize(Number(e.target.value))}
@@ -110,16 +109,17 @@ const Course = () => {
           ))}
         </select>
 
-        {/* Add Button */}
-        <button
-          onClick={() => navigate("/course/create")}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-        >
-          Add Course
-        </button>
+        {userRole === "Teacher" && (
+          <button
+            onClick={() => navigate("/course/create")}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+          >
+            Add Course
+          </button>
+        )}
+
       </div>
 
-      {/* Course Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {courses.map((course) => (
           <div
@@ -133,29 +133,28 @@ const Course = () => {
             <p className="text-gray-500 font-medium mb-4">
               Written by: {course.teacherName}
             </p>
-
-            {/* ✅ Enroll Button */}
-            <button
-              onClick={() => handleEnroll(course.courseId)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            >
-              Enroll
-            </button>
+            {userRole === "Student" && (
+              <button
+                onClick={() => handleEnroll(course.courseId)}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                Enroll
+              </button>
+            )}
           </div>
+
         ))}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-8 gap-2 flex-wrap">
           <button
             onClick={handlePrevious}
             disabled={page === 1}
-            className={`px-3 py-1 rounded ${
-              page === 1
-                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gray-400 hover:bg-gray-500 text-white"
-            }`}
+            className={`px-3 py-1 rounded ${page === 1
+              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+              : "bg-gray-400 hover:bg-gray-500 text-white"
+              }`}
           >
             Previous
           </button>
@@ -164,11 +163,10 @@ const Course = () => {
             <button
               key={p}
               onClick={() => fetchCourses(p, searchTerm, pageSize)}
-              className={`px-3 py-1 rounded ${
-                page === p
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
+              className={`px-3 py-1 rounded ${page === p
+                ? "bg-blue-600 text-white"
+                : "bg-gray-300 hover:bg-gray-400"
+                }`}
             >
               {p}
             </button>
@@ -177,11 +175,10 @@ const Course = () => {
           <button
             onClick={handleNext}
             disabled={page === totalPages}
-            className={`px-3 py-1 rounded ${
-              page === totalPages
-                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gray-400 hover:bg-gray-500 text-white"
-            }`}
+            className={`px-3 py-1 rounded ${page === totalPages
+              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+              : "bg-gray-400 hover:bg-gray-500 text-white"
+              }`}
           >
             Next
           </button>
