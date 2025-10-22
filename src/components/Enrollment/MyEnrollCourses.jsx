@@ -34,7 +34,7 @@ const MyEnrollCourses = () => {
     try {
       await api.delete(`/Enrollment/unenroll?studentId=${user.userId}&courseId=${courseId}`);
       alert("Unenrolled successfully!");
-      fetchMyEnrollCourses(); // ✅ Correct function call
+      fetchMyEnrollCourses(); 
     } catch (error) {
       console.error("Error during unenroll:", error);
       alert("Failed to unenroll");
