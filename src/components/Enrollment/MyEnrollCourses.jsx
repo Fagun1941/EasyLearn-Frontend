@@ -6,7 +6,6 @@ const MyEnrollCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get user from token once
   const user = getUserFromToken();
 
   const fetchMyEnrollCourses = async () => {
