@@ -6,7 +6,6 @@ const MyEnrollCourses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get user from token once
   const user = getUserFromToken();
 
   const fetchMyEnrollCourses = async () => {
@@ -34,7 +33,7 @@ const MyEnrollCourses = () => {
     try {
       await api.delete(`/Enrollment/unenroll?studentId=${user.userId}&courseId=${courseId}`);
       alert("Unenrolled successfully!");
-      fetchMyEnrollCourses(); // ✅ Correct function call
+      fetchMyEnrollCourses(); 
     } catch (error) {
       console.error("Error during unenroll:", error);
       alert("Failed to unenroll");
