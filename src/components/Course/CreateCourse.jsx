@@ -9,6 +9,8 @@ const CreateCourse = () => {
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
+  const [maxNumberEnroll, setMaxNumberEnroll] = useState("");
+
   const navigate = useNavigate();
 
   const [teacherId, setTeacherId] = useState(null);
@@ -25,7 +27,6 @@ const CreateCourse = () => {
     }
   }, [navigate]);
 
-  // 🔹 Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -39,7 +40,6 @@ const CreateCourse = () => {
     fetchCategories();
   }, []);
 
-  // 🔹 Handle course creation
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,7 +59,8 @@ const CreateCourse = () => {
         description,
         price: parseFloat(price),
         categoryCourseId: parseInt(categoryId),
-        teacherId: teacherId, // ✅ Auto from token
+        teacherId: teacherId, 
+        maxNumberEnroll
       };
 
       await api.post("/Course/Create", payload);
@@ -120,6 +121,15 @@ const CreateCourse = () => {
               </option>
             ))}
           </select>
+
+           <input
+            type="number"
+            placeholder="Max Number of Enrollments"
+            value={maxNumberEnroll}
+            onChange={(e) => setMaxNumberEnroll(e.target.value)}
+            className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
 
           <div className="flex gap-2 mt-4">
             <button

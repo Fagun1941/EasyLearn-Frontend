@@ -2,13 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
 
-/**
- * Robust CourseEdit component:
- * - Loads category list from /CategoryCourse/GetAll (handles multiple shapes)
- * - Loads course details from /Course/GetById/{id} (handles several shapes)
- * - Normalizes data and pre-selects category in dropdown
- * - Submits PUT /Course/Update with required payload
- */
 
 const CourseEdit = () => {
   const { id } = useParams();
@@ -20,25 +13,23 @@ const CourseEdit = () => {
     description: "",
     price: 0,
     categoryCourseId: 0,
+    maxNumberEnroll: 0,
   });
 
-  const [categories, setCategories] = useState([]); // normalized: { id, name }
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // normalize categories returned from backend into { id, name }
   const normalizeCategories = (raw) => {
     if (!raw) return [];
-    // If API returns paged response: { items: [...] }
     const list = Array.isArray(raw) ? raw : raw.items ?? raw;
     if (!Array.isArray(list)) return [];
 
     return list.map((c) => {
-      // try a few common property names
       const id =
         c.categoryCourseId ??
         c.categoryId ??
         c.id ??
-        (c.CategoryCourseId ?? undefined); // fallbacks
+        (c.CategoryCourseId ?? undefined); 
       const name =
         c.categoryCourseName ??
         c.categoryName ??
@@ -53,7 +44,6 @@ const CourseEdit = () => {
 
   const fetchCategories = async () => {
     try {
-      // use CategoryCourse endpoint (you used this in backend)
       const res = await api.get("/CategoryCourse/GetAll");
       const normalized = normalizeCategories(res.data);
       setCategories(normalized);
@@ -66,14 +56,12 @@ const CourseEdit = () => {
     }
   };
 
-  // fetch single course and try to extract category id
   const fetchCourse = async (cats = []) => {
     try {
       const res = await api.get(`/Course/GetById/${id}`);
       const data = res.data;
       console.log("Course data from API:", data);
 
-      // try several ways to get categoryCourseId
       let categoryCourseId =
         data.categoryCourseId ??
         data.categoryCourse?.categoryCourseId ??
@@ -83,7 +71,6 @@ const CourseEdit = () => {
         data.category?.id ??
         null;
 
-      // if server only returns categoryName, try to find id from categories
       if (!categoryCourseId && data.categoryName) {
         const found = cats.find(
           (c) =>
@@ -92,9 +79,7 @@ const CourseEdit = () => {
         if (found) categoryCourseId = found.id;
       }
 
-      // Some APIs return category object in different casing. Try to match by any nested name
       if (!categoryCourseId) {
-        // attempt to match by any name-like field inside data.categoryCourse or data.category
         const nestedCategory =
           data.categoryCourse ?? data.category ?? data.CategoryCourse ?? data.Category;
         if (nestedCategory) {
@@ -106,7 +91,6 @@ const CourseEdit = () => {
         }
       }
 
-      // As a last resort, try to match by categoryName to categories list again:
       if (!categoryCourseId && cats.length > 0 && data.categoryName) {
         const found = cats.find(
           (c) => String(c.name).toLowerCase() === String(data.categoryName).toLowerCase()
@@ -120,6 +104,7 @@ const CourseEdit = () => {
         description: data.description ?? data.desc ?? "",
         price: data.price ?? 0,
         categoryCourseId: categoryCourseId ?? 0,
+        maxNumberEnroll: data.maxNumberEnroll ?? 0,
       });
 
       console.log("Normalized course state:", {
@@ -135,23 +120,20 @@ const CourseEdit = () => {
   };
 
   useEffect(() => {
-    // load categories then course (so we can try matching by name if needed)
     (async () => {
       setLoading(true);
       const cats = await fetchCategories();
       await fetchCourse(cats);
       setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // if number fields, keep numeric type except empty string
     setCourse((prev) => ({
       ...prev,
       [name]:
-        name === "price" || name === "categoryCourseId"
+        name === "price" || name === "categoryCourseId" || name === "maxNumberEnroll"
           ? value === "" ? "" : Number(value)
           : value,
     }));
@@ -160,20 +142,19 @@ const CourseEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // validate required
     if (!course.title || course.categoryCourseId === 0 || course.categoryCourseId === "") {
       alert("Please fill title and select a category.");
       return;
     }
 
     try {
-      // Build payload expected by your PUT /Course/Update
       const payload = {
         courseId: Number(course.courseId),
         title: course.title,
         description: course.description,
         price: Number(course.price),
         categoryCourseId: Number(course.categoryCourseId),
+        maxNumberEnroll: Number(course.maxNumberEnroll),
       };
 
       console.log("Sending update payload:", payload);
@@ -196,7 +177,6 @@ const CourseEdit = () => {
         <h2 className="text-2xl font-bold mb-4 text-center">Edit Course</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
           <div>
             <label className="block font-semibold mb-1">Title</label>
             <input
@@ -209,7 +189,6 @@ const CourseEdit = () => {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block font-semibold mb-1">Description</label>
             <textarea
@@ -220,7 +199,6 @@ const CourseEdit = () => {
             />
           </div>
 
-          {/* Price */}
           <div>
             <label className="block font-semibold mb-1">Price</label>
             <input
@@ -232,7 +210,6 @@ const CourseEdit = () => {
             />
           </div>
 
-          {/* Category Dropdown */}
           <div>
             <label className="block font-semibold mb-1">Category</label>
             <select
@@ -250,8 +227,18 @@ const CourseEdit = () => {
               ))}
             </select>
           </div>
+          <div>
+            <label className="block font-semibold mb-1">Max Number of Enroll</label>
+            <input
+              type="number"
+              name="maxNumberEnroll"
+              value={course.maxNumberEnroll}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+            />
+          </div>
+          
 
-          {/* Buttons */}
           <div className="flex justify-between mt-6">
             <button
               type="button"

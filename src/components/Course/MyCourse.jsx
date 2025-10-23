@@ -6,19 +6,24 @@ import { getUserFromToken } from "../../utils/auth";
 const MyCourse = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showSoftDeleted, setShowSoftDeleted] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMyCourses = async () => {
       try {
         const user = getUserFromToken();
-        //alert("User ID: " + (user ? user.userId : "No user"));
         if (!user || !user.userId) {
           alert("User not found! Please login again.");
           return;
         }
 
-        const response = await api.get(`/Course/GetByTeacherId/${user.userId}`);
+        let url = `/Course/GetByTeacherId/${user.userId}`;
+        if (showSoftDeleted) {
+          url = `/Course/GetAllSoftDeletedCourse?Id=${user.userId}`;
+        }
+
+        const response = await api.get(url);
         setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -28,19 +33,58 @@ const MyCourse = () => {
     };
 
     fetchMyCourses();
-  }, []);
+  }, [showSoftDeleted]);
+
+  const handlePermanentDelete = async (courseId) => {
+    if (window.confirm("Are you sure you want to permanently delete this course?")) {
+      try {
+        await api.delete(`/Course/PermanentDelete/${courseId}`);
+        alert("Course permanently deleted!");
+        setCourses(courses.filter(c => c.courseId !== courseId));
+      } catch (error) {
+        console.error("Failed to delete course:", error);
+        alert("Failed to delete course");
+      }
+    }
+  };
+
+  const handleRestore = async (courseId) => {
+    try {
+      await api.patch(`/Course/Restore/${courseId}`);
+      alert("Course restored successfully!");
+      setCourses(courses.filter(c => c.courseId !== courseId));
+    } catch (error) {
+      console.error("Failed to restore course:", error);
+      alert("Failed to restore course");
+    }
+  };
 
   if (loading) {
     return <div className="text-center mt-10 text-gray-600">Loading...</div>;
   }
 
   if (courses.length === 0) {
-    return <div className="text-center mt-10 text-gray-600">No courses found.</div>;
+    return (
+      <div className="text-center mt-10 text-gray-600">
+        {showSoftDeleted ? "No soft-deleted courses found." : "No courses found."}
+      </div>
+    );
   }
 
   return (
     <div className="max-w-5xl mx-auto mt-10">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">My Courses</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-800">My Courses</h2>
+        <button
+          onClick={() => setShowSoftDeleted(!showSoftDeleted)}
+          className={`px-4 py-2 rounded transition ${
+            showSoftDeleted ? "bg-red-600 text-white" : "bg-gray-300"
+          }`}
+        >
+          {showSoftDeleted ? "Show Active Courses" : "Show Deleted Courses"}
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
           <div
@@ -55,13 +99,29 @@ const MyCourse = () => {
               <span className="text-sm text-gray-400">By {course.teacherName}</span>
             </div>
 
-            {/* Details Button */}
-            <button
-              onClick={() => navigate(`/course/details/${course.courseId}`)}
-              className="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Details
-            </button>
+            {showSoftDeleted ? (
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => handleRestore(course.courseId)}
+                  className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  Restore
+                </button>
+                <button
+                  onClick={() => handlePermanentDelete(course.courseId)}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  Permanently Delete
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate(`/course/details/${course.courseId}`)}
+                className="mt-4 w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                Details
+              </button>
+            )}
           </div>
         ))}
       </div>

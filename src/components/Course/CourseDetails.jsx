@@ -26,7 +26,7 @@ const CourseDetails = () => {
       try {
         await deleteCourse(id);
         alert("Course deleted successfully!");
-        navigate("/course"); 
+        navigate("/my-course"); 
       } catch (error) {
         console.error("Failed to delete course:", error);
         alert("Failed to delete course");
@@ -56,6 +56,8 @@ const CourseDetails = () => {
           <p><strong>Teacher:</strong> {course.teacherName}</p>
           <p><strong>Price:</strong> ${course.price}</p>
           <p><strong>Description:</strong> {course.description}</p>
+          <strong>Enrolled:</strong> {course.numberofEnroll??0}/{course.maxNumberEnroll }
+          
         </div>
 
         <div className="flex justify-between mt-8">

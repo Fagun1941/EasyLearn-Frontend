@@ -33,7 +33,7 @@ const AllUsers = () => {
       try {
         await api.delete(`/Admin/Delete-User?userId=${userId}`);
         alert("User deleted successfully!");
-        fetchUsers(page, pageSize); // refresh
+        fetchUsers(page, pageSize);
       } catch (error) {
         console.error("Failed to delete user:", error);
         alert("Failed to delete user");
@@ -61,7 +61,6 @@ const AllUsers = () => {
         All Users
       </h2>
 
-      {/* Page Size Selector */}
       <div className="flex justify-between items-center mb-4">
         <div>
           <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
@@ -72,7 +71,7 @@ const AllUsers = () => {
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
-              setPage(1); // reset to first page
+              setPage(1); 
             }}
             className="border border-gray-300 rounded px-2 py-1"
           >
@@ -85,7 +84,6 @@ const AllUsers = () => {
         </div>
       </div>
 
-      {/* Users Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead>
@@ -93,7 +91,6 @@ const AllUsers = () => {
               <th className="py-3 px-6">#</th>
               <th className="py-3 px-6">Full Name</th>
               <th className="py-3 px-6">Email</th>
-              <th className="py-3 px-6">Teacher Approved</th>
               <th className="py-3 px-6 text-center">Action</th>
             </tr>
           </thead>
@@ -108,13 +105,6 @@ const AllUsers = () => {
                 </td>
                 <td className="py-3 px-6">{user.fullName}</td>
                 <td className="py-3 px-6">{user.email}</td>
-                <td className="py-3 px-6">
-                  {user.isTeacherApproved ? (
-                    <span className="text-green-600 font-semibold">Yes</span>
-                  ) : (
-                    <span className="text-red-500 font-semibold">No</span>
-                  )}
-                </td>
                 <td className="py-3 px-6 text-center">
                   <button
                     onClick={() => handleDelete(user.id)}
@@ -129,7 +119,6 @@ const AllUsers = () => {
         </table>
       </div>
 
-      {/* Numeric Pagination */}
       <div className="flex justify-center items-center gap-2 mt-6">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

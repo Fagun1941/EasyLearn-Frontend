@@ -121,29 +121,56 @@ const Course = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {courses.map((course) => (
-          <div
-            key={course.courseId}
-            className="border rounded-xl shadow-lg p-6 bg-white flex flex-col items-center text-center"
-          >
-            <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-            <p className="text-gray-700 font-medium mb-2">
-              Price: ${course.price}
-            </p>
-            <p className="text-gray-500 font-medium mb-4">
-              Written by: {course.teacherName}
-            </p>
-            {userRole === "Student" && (
-              <button
-                onClick={() => handleEnroll(course.courseId)}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              >
-                Enroll
-              </button>
-            )}
-          </div>
+       {courses.map((course) => (
+  <div
+    key={course.courseId}
+    className="border rounded-xl shadow-lg p-6 bg-white flex flex-col items-center text-center"
+  >
+    <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+    <p className="text-gray-700 font-medium mb-1">
+      Price: ${course.price}
+    </p>
+    <p className="text-gray-500 font-medium mb-2">
+      Written by: {course.teacherName}
+    </p>
 
-        ))}
+    {/* ✅ Enrollment Info */}
+    <p className="text-gray-600 font-medium mb-2">
+      Enrolled: {course.numberofEnroll} / {course.maxNumberEnroll}
+    </p>
+
+    {/* ✅ Progress Bar */}
+    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+      <div
+        className="bg-blue-600 h-2.5 rounded-full"
+        style={{
+          width: `${Math.min(
+            (course.numberofEnroll / course.maxNumberEnroll) * 100,
+            100
+          )}%`,
+        }}
+      ></div>
+    </div>
+
+    {/* ✅ Enroll Button (Disabled if full) */}
+    {userRole === "Student" && (
+      <button
+        onClick={() => handleEnroll(course.courseId)}
+        disabled={course.numberofEnroll >= course.maxNumberEnroll}
+        className={`px-4 py-2 rounded transition ${
+          course.numberofEnroll >= course.maxNumberEnroll
+            ? "bg-gray-400 text-white cursor-not-allowed"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        }`}
+      >
+        {course.numberofEnroll >= course.maxNumberEnroll
+          ? "Full"
+          : "Enroll"}
+      </button>
+    )}
+  </div>
+))}
+
       </div>
 
       {totalPages > 1 && (
