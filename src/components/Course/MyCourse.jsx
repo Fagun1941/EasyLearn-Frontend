@@ -53,6 +53,9 @@ const MyCourse = () => {
             <div className="mt-4 flex justify-between items-center">
               <span className="text-green-600 font-semibold">${course.price}</span>
               <span className="text-sm text-gray-400">By {course.teacherName}</span>
+              <p>
+            
+          </p>
             </div>
 
             {/* Details Button */}
