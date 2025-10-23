@@ -26,7 +26,7 @@ const CourseDetails = () => {
       try {
         await deleteCourse(id);
         alert("Course deleted successfully!");
-        navigate("/course"); 
+        navigate("/my-course"); 
       } catch (error) {
         console.error("Failed to delete course:", error);
         alert("Failed to delete course");
