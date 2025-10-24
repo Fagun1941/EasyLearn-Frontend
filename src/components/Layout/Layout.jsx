@@ -75,6 +75,12 @@ const Layout = () => {
             My Enroll Courses
           </Link>
           )}
+
+          {role === "Admin" && (
+          <Link to="/Error" className="hover:underline">
+            Error Logs
+          </Link>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">

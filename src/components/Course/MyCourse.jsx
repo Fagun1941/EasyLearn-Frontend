@@ -38,7 +38,7 @@ const MyCourse = () => {
   const handlePermanentDelete = async (courseId) => {
     if (window.confirm("Are you sure you want to permanently delete this course?")) {
       try {
-        await api.delete(`/Course/PermanentDelete/${courseId}`);
+        await api.delete(`/Course/DeletePermanent/${courseId}`);
         alert("Course permanently deleted!");
         setCourses(courses.filter(c => c.courseId !== courseId));
       } catch (error) {
@@ -50,7 +50,7 @@ const MyCourse = () => {
 
   const handleRestore = async (courseId) => {
     try {
-      await api.patch(`/Course/Restore/${courseId}`);
+      await api.patch(`/Course/RestoreCourse/${courseId}`);
       alert("Course restored successfully!");
       setCourses(courses.filter(c => c.courseId !== courseId));
     } catch (error) {
