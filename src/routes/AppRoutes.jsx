@@ -17,6 +17,7 @@ import PendingTeacherList from "../components/Admin/PendingTeacherList";
 import MyEnrollCourses from "../components/Enrollment/MyEnrollCourses";
 import EnrollmentStudent from "../components/Enrollment/EnrollmentStudentByCourseId";
 import ErrorPage from "../components/Admin/ErrorPage";
+import DetailsError from "../components/Admin/DetailsError";
 
 const AppRoutes = () => {
   return (
@@ -37,8 +38,8 @@ const AppRoutes = () => {
         <Route path="/myenroll" element={<MyEnrollCourses />} />
         <Route path="/course/:id/enrollment" element={<EnrollmentStudent />} />
         <Route path="error" element={<ErrorPage />} />
+        <Route path="/error-details/:id" element={<DetailsError />} />
 
-        
       </Route>
 
       <Route path="/login" element={<Login />} />
