@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axiosConfig";
-import "./ErrorPage.css"; 
-import api from './../../api/axiosConfig';
+import "./ErrorPage.css";
 
 const ErrorPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [top, setTop] = useState(50); // 👈 selected number of logs
   const navigate = useNavigate();
 
+  // Fetch logs when "top" changes
   useEffect(() => {
     const fetchLogs = async () => {
+      setLoading(true);
       try {
         const response = await api.get(
-          "https://localhost:44389/api/Logs/errors?top=50"
+          `https://localhost:44389/api/Logs/errors?top=${top}`
         );
         setLogs(response.data);
       } catch (err) {
@@ -26,15 +28,37 @@ const ErrorPage = () => {
     };
 
     fetchLogs();
-  }, []);
+  }, [top]);
 
   if (loading) return <p>Loading logs...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Error Logs</h2>
+      {/* Header with Dropdown */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold">Error Logs</h2>
 
+        <div className="flex items-center gap-2">
+          <label htmlFor="topSelect" className="font-medium">
+            Show Top:
+          </label>
+          <select
+            id="topSelect"
+            value={top}
+            onChange={(e) => setTop(Number(e.target.value))}
+            className="border rounded px-2 py-1"
+          >
+            {[10, 20, 40, 50, 100].map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Logs Table */}
       <div className="max-h-[70vh] overflow-y-auto border rounded-lg shadow-sm">
         <table className="min-w-full border-collapse">
           <thead className="bg-gray-200 sticky top-0 z-10">
@@ -55,7 +79,9 @@ const ErrorPage = () => {
                   {new Date(log.timeStamp).toLocaleString()}
                 </td>
                 <td className="border px-2 py-1">{log.level}</td>
-                <td className="border px-2 py-1 truncate-2-lines">{log.message}</td>
+                <td className="border px-2 py-1 truncate-2-lines">
+                  {log.message}
+                </td>
                 <td className="border px-2 py-1">
                   <pre className="whitespace-pre-wrap max-h-12 overflow-hidden text-ellipsis">
                     {log.exception}
@@ -78,7 +104,6 @@ const ErrorPage = () => {
         </table>
       </div>
     </div>
-
   );
 };
 
