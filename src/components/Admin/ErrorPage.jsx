@@ -7,7 +7,7 @@ const ErrorPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [top, setTop] = useState(50); // 👈 selected number of logs
+  const [top, setTop] = useState(10); 
   const navigate = useNavigate();
 
   // Fetch logs when "top" changes
@@ -35,7 +35,7 @@ const ErrorPage = () => {
 
   return (
     <div className="p-4">
-      {/* Header with Dropdown */}
+ 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold">Error Logs</h2>
 
@@ -79,7 +79,7 @@ const ErrorPage = () => {
                   {new Date(log.timeStamp).toLocaleString()}
                 </td>
                 <td className="border px-2 py-1">{log.level}</td>
-                <td className="border px-2 py-1 truncate-2-lines">
+                <td className="border px-2 py-1">
                   {log.message}
                 </td>
                 <td className="border px-2 py-1">
