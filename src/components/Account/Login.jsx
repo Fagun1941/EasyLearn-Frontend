@@ -28,8 +28,8 @@ const Login = () => {
 
     if (!form.password.trim()) {
       newErrors.password = "Password is required";
-    } else if (form.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (form.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -43,10 +43,11 @@ const Login = () => {
 
     try {
       const response = await api.post("/Account/login", form);
-      const { token, message, userName } = response.data;
+      const { token, message, userName,refreshToken } = response.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("userName", userName);
+      localStorage.setItem("refreshToken", refreshToken);
 
       alert(message || "Login successful!");
       navigate("/Home");

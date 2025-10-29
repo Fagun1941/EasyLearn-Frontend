@@ -15,20 +15,30 @@ const Layout = () => {
     if (storedUser) setUserId(storedUser.userId);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await api.post("/Account/logout");
-      alert("Logged out successfully");
-    } catch (error) {
-      console.error("Logout API failed", error);
-    } finally {
-      alert("You have been logged out.");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("token");
-      setUser(null);
-      navigate("/login");
-    }
-  };
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    await api.post("/Account/logout", null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "X-Refresh-Token": refreshToken
+      }
+    });
+
+    alert("Logged out successfully");
+  } catch (error) {
+    console.error("Logout API failed", error);
+  } finally {
+    localStorage.removeItem("userName");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+    navigate("/login");
+  }
+};
+
 
   const handleSendTeacherRequest = async () => {
     try {

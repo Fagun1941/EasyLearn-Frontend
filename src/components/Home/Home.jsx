@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getUserFromToken } from "../../utils/auth"; 
+import { getUserFromToken } from "../../utils/auth";
 import api from "../../api/axiosConfig";
 
 const Home = () => {
@@ -14,23 +14,40 @@ const Home = () => {
 
   const handleLogout = async () => {
     try {
-      await api.post("/Account/logout"); 
+      const token = localStorage.getItem("token");
+      const refreshToken = localStorage.getItem("refreshToken");
+      alert("Logging out...");
+
+      await api.post(
+        "/Account/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Refresh-Token": refreshToken,
+          },
+        }
+      );
+
       alert("Logged out successfully");
     } catch (error) {
       console.error("Logout API failed", error);
+      alert("Failed to logout properly. You may need to refresh the page.");
     } finally {
-      alert("You have been logged out.");
-      localStorage.removeItem("userName");
+      // Clear local storage and state
       localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userName");
       setUser(null);
       navigate("/login");
     }
   };
 
 
+
   return (
     <div className="min-h-screen bg-gray-50">
-    
+
 
       {/* Main Content */}
       <main className="flex flex-col items-center justify-center text-center mt-20">
